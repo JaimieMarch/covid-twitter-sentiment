@@ -5,6 +5,7 @@ from alembic import command
 from alembic.config import Config
 import os
 from dotenv import load_dotenv
+import subprocess
 load_dotenv()
 
 
@@ -14,8 +15,19 @@ Global Vars
 db_url = os.getenv("DB_URL")
 engine = create_engine(db_url)
 metadata = MetaData() 
-alembic_cfg = Config("alembic.ini")
+__all__ = ['metadata']
 
+# print(os.path.join(os.path.dirname(__file__), '../../alembic.ini'))
+alembic_cfg = "/home/raimuu/Fall-24/CPSC-571/covid-twitter-sentiment/alembic.ini"
+# alembic_cfg = os.path.join(os.path.dirname(__file__), '../../alembic.ini')
+print(alembic_cfg)
+# print(alembic_cfg)
+# alembic_cfg = Config('/home/raimuu/Fall-24/CPSC-571/covid-twitter-sentiment/alembic.ini')
+# alembic_cfg = Config('../../alembic.ini')
+# print(f"Path to alembic.ini: {alembic_cfg.config_file_name}")
+# alembic_ini_path = ('/covid-twitter-sentiment/alembic.ini') 
+# print(f"Absolute path to alembic.ini: {alembic_ini_path}") 
+alembic_cfg = Config(alembic_cfg)
 
 
 """
@@ -47,41 +59,47 @@ Args:
    dataframe (str): pandas dataframe
 """
 def create_table(table_name, file_path=None, dataframe=None, replace=False):
-   if not table_name:
+    if not table_name:
         raise ValueError("Error: 'table_name' parameter is required.")
-   if file_path:
-      df = pd.read_csv(file_path)
-   if dataframe:
-      df = dataframe
+    if file_path:
+        df = pd.read_csv(file_path)
+    elif dataframe is not None and not dataframe.empty: 
+        df = dataframe
+    else:
+        raise ValueError("Error: Either 'file_path' or 'dataframe' must be provided.")
+    
 
    # print(df.head())
    
-   inspector = inspect(engine)
-   table_exists = inspector.has_table(table_name)
+    inspector = inspect(engine)
+    table_exists = inspector.has_table(table_name)
 
-   # check if table exists
-   if table_exists and replace:
+    # check if table exists
+    if table_exists and replace:
         print(f"The table '{table_name}' already exists. Replacing entries.")
         df.to_sql(table_name, con=engine, if_exists='replace', index=False, method="multi", chunksize=50000)
-   elif table_exists and not replace:
+    elif table_exists and not replace:
         print(f"The table '{table_name}' already exists. Use 'replace=True' to overwrite.")
         return
-   else:
+    else:
         # infer the column types
         columns = [Column(name, infer_sqllchemy_type(dtype)) for name, dtype in df.dtypes.items()]
-        table = Table(table_name, metadata, *columns)
+        table = Table(table_name, metadata, *columns, extend_existing=True)
 
         # create the table
         table.create(engine)
+
+        print(f"Creating {table_name} table\n")
 
         # update the entries with dataframe
         df.to_sql(table_name, con=engine, if_exists='append', index=False, method="multi", chunksize=50000)
 
         # log the table creation with Alembic (generates migration, but does not apply it)
-        command.revision(alembic_cfg, autogenerate=True, message=f"Added table {table_name}")
-   
-   # tuples = [(name, dtype.name, type(df[name].dropna().iloc[0]).__name__) for name, dtype in df.dtypes.items()]
-   # print(tuples)
+        # command.revision(alembic_cfg, autogenerate=True, message=f"Added table {table_name}")
+        subprocess.run(["/bin/bash", "../../run_alembic.sh"])
+        # list_tables()
+#    tuples = [(name, dtype.name, type(df[name].dropna().iloc[0]).__name__) for name, dtype in df.dtypes.items()]
+#    print(tuples)
 
    # confirm table creation
    # query = f"SELECT * FROM {table_name}"
@@ -171,7 +189,7 @@ def list_tables():
 
 # sql_query=f""" SELECT * FROM "clean_twitter_data" """ 
 # delete_table("clean_twitter_data") 
-create_table("clean_twitter_data", file_path="../../data/processed/cleanCovidTwitterData.zip") 
+# create_table("clean_twitter_data", file_path="../../data/processed/cleanCovidTwitterData.zip") 
 # # create_table("raw_twitter_data", file_path="../../data/raw/covidTwitterData.zip") 
 # res = query_db(sql_query) 
 # print(res.head())
