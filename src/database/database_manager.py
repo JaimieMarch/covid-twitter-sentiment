@@ -17,18 +17,6 @@ engine = create_engine(db_url)
 metadata = MetaData() 
 __all__ = ['metadata']
 
-# print(os.path.join(os.path.dirname(__file__), '../../alembic.ini'))
-alembic_cfg = "/home/raimuu/Fall-24/CPSC-571/covid-twitter-sentiment/alembic.ini"
-# alembic_cfg = os.path.join(os.path.dirname(__file__), '../../alembic.ini')
-print(alembic_cfg)
-# print(alembic_cfg)
-# alembic_cfg = Config('/home/raimuu/Fall-24/CPSC-571/covid-twitter-sentiment/alembic.ini')
-# alembic_cfg = Config('../../alembic.ini')
-# print(f"Path to alembic.ini: {alembic_cfg.config_file_name}")
-# alembic_ini_path = ('/covid-twitter-sentiment/alembic.ini') 
-# print(f"Absolute path to alembic.ini: {alembic_ini_path}") 
-alembic_cfg = Config(alembic_cfg)
-
 
 """
 Infers schema based on pandas data types
@@ -94,10 +82,6 @@ def create_table(table_name, file_path=None, dataframe=None, replace=False):
         # update the entries with dataframe
         df.to_sql(table_name, con=engine, if_exists='append', index=False, method="multi", chunksize=50000)
 
-        # log the table creation with Alembic (generates migration, but does not apply it)
-        # command.revision(alembic_cfg, autogenerate=True, message=f"Added table {table_name}")
-        subprocess.run(["/bin/bash", "../../run_alembic.sh"])
-        # list_tables()
 #    tuples = [(name, dtype.name, type(df[name].dropna().iloc[0]).__name__) for name, dtype in df.dtypes.items()]
 #    print(tuples)
 
@@ -193,6 +177,11 @@ def list_tables():
 # # create_table("raw_twitter_data", file_path="../../data/raw/covidTwitterData.zip") 
 # res = query_db(sql_query) 
 # print(res.head())
+# table = "processed_twitter_data"
+# query = """
+#     SELECT * FROM "{table}"
+# """
+# query_db(query)
 
 
 """
