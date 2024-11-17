@@ -1,0 +1,49 @@
+Abbreviation,Full Form
+COVID,Coronavirus Disease
+SARS-CoV-2,Severe Acute Respiratory Syndrome Coronavirus 2
+PPE,Personal Protective Equipment
+ICU,Intensive Care Unit
+PCR,Polymerase Chain Reaction
+RAT,Rapid Antigen Test
+LFT,Lateral Flow Test
+WHO,World Health Organization
+CDC,Centers for Disease Control and Prevention
+NIH,National Institutes of Health
+FDA,Food and Drug Administration
+mRNA,Messenger Ribonucleic Acid
+NIOSH,National Institute for Occupational Safety and Health
+HCP,Healthcare Provider
+ARDS,Acute Respiratory Distress Syndrome
+EUA,Emergency Use Authorization
+CFR,Case Fatality Rate
+R0,Basic Reproduction Number
+NPI,Non-Pharmaceutical Interventions
+VOCs,Variants of Concern
+VOIs,Variants of Interest
+HCQ,Hydroxychloroquine
+IV,Intravenous
+O2,Oxygen
+CT,Computed Tomography
+CRP,C-Reactive Protein
+HRCT,High-Resolution Computed Tomography
+RT-PCR,Reverse Transcription Polymerase Chain Reaction
+COVAX,COVID-19 Vaccines Global Access
+AZ,AstraZeneca Vaccine
+Pfizer-BioNTech,Pfizer-BioNTech Vaccine (BNT162b2)
+Moderna,Moderna Vaccine (mRNA-1273)
+J&J,Johnson & Johnson Vaccine
+Sputnik V,Sputnik V Vaccine
+Sinovac,Sinovac Vaccine (CoronaVac)
+IVIG,Intravenous Immunoglobulin
+Tocilizumab,A drug used for inflammation in severe COVID cases
+Remdesivir,Antiviral medication
+WFH,Work From Home
+HWC,Healthcare Worker
+SOP,Standard Operating Procedure
+F2F,Face to Face
+EPI,Expanded Program on Immunization
+UHC,Universal Health Coverage
+PHSM,Public Health and Social Measures
+AGP,Aerosol-Generating Procedure
+NH,Nursing Home
+QoL,Quality of Life
