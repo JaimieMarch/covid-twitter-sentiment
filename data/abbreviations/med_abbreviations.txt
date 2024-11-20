@@ -1,5 +1,10 @@
 Abbreviation,Full Form
 COVID,Coronavirus Disease
+COVID,Coronavirus Disease
+covid19,Coronavirus Disease of 2019
+covid-19,Coronavirus Disease of 2019
+COVID19,Coronavirus Disease of 2019
+COVID-19,Coronavirus Disease of 2019
 SARS-CoV-2,Severe Acute Respiratory Syndrome Coronavirus 2
 PPE,Personal Protective Equipment
 ICU,Intensive Care Unit
