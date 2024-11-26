@@ -13,6 +13,11 @@ returns df
 '''
 def get_sentiment_data():
     print("Retrieving sentiment scores table...")
+    '''
+        other tables in DB:
+        table = "raw_twitter_data"
+        table = "processed_twitter_data"
+    '''
     table = "sentiment_scores"
     query = f"""
         SELECT * 
