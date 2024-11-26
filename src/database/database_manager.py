@@ -65,7 +65,7 @@ def create_table(table_name, file_path=None, dataframe=None, replace=False):
     # check if table exists
     if table_exists and replace:
         print(f"The table '{table_name}' already exists. Replacing entries.")
-        df.to_sql(table_name, con=engine, if_exists='replace', index=False, method="multi", chunksize=50000)
+        df.to_sql(table_name, con=engine, if_exists='replace', index=True, index_label="id", method="multi", chunksize=50000)
     elif table_exists and not replace:
         print(f"The table '{table_name}' already exists. Use 'replace=True' to overwrite.")
         return
@@ -80,7 +80,7 @@ def create_table(table_name, file_path=None, dataframe=None, replace=False):
         print(f"Creating {table_name} table\n")
 
         # update the entries with dataframe
-        df.to_sql(table_name, con=engine, if_exists='append', index=False, method="multi", chunksize=50000)
+        df.to_sql(table_name, con=engine, if_exists='append', index=True, index_label="id", method="multi", chunksize=50000)
 
 #    tuples = [(name, dtype.name, type(df[name].dropna().iloc[0]).__name__) for name, dtype in df.dtypes.items()]
 #    print(tuples)
@@ -127,7 +127,7 @@ def insert_record(table_name, record):
     if not record:
         raise ValueError("Error: 'record' parameter is required.")
     df = pd.DataFrame([record])
-    df.to_sql(table_name, con=engine, if_exists='append', index=False)
+    df.to_sql(table_name, con=engine, if_exists='append', index=True)
     print(f"Record inserted into {table_name}")
 
 """
