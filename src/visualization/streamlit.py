@@ -212,6 +212,114 @@ def word_cloud_plot(tf_idf_df, df_sent):
     st.pyplot(plt)
 
 
+def top_hashtags_per_sentiment(df_sent, sentiment):
+    df_sent = df_sent[df_sent['sentiment'] == sentiment]
+
+    # Make all hashtags lowercase
+    df_sent['hashtags'] = df_sent['hashtags'].str.lower()
+
+    no_terms = ["covidvaccine", "covid19", "covid", "vaccine", "coronavirus", "covid-19", "vaccines", "vaccination", "virus", "get", "shot", "slot"]
+
+
+
+    # Flatten the list of hashtags
+    hashtags = df_sent['hashtags'].str.split().explode()
+
+    hashtags = hashtags.str.replace('[', '', regex=False).str.replace(']', '', regex=False)
+
+    # Filter to not include the no_terms
+    hashtags = hashtags[~hashtags.isin(no_terms)]
+
+    hashtags = hashtags[hashtags != 'nan']
+
+    hashtags = hashtags.str.strip()
+
+    # Count the frequency of each hashtag
+    hashtag_counts = hashtags.value_counts()
+
+    # Plot the top 10 hashtags
+    plt.figure(figsize=(10, 6))
+    hashtag_counts.head(10).plot(kind='bar', color='#1E90FF')
+    plt.title(f'Top 10 Hashtags in {sentiment.capitalize()} Tweets')
+    plt.xlabel('Hashtag')
+    plt.ylabel('Frequency')
+    plt.tight_layout()
+
+    st.pyplot(plt)
+
+
+def follower_amount_sentiment(df_sent):
+    df_sent = df_sent[df_sent['sentiment'] != 'neutral']
+
+    # Create a scatter plot of the number of followers vs sentiment score
+    plt.figure(figsize=(10, 6))
+    plt.scatter(df_sent['user_followers'], df_sent['compound'], alpha=0.5)
+    plt.title('Number of Followers vs Sentiment Score')
+    plt.xlabel('Number of Followers')
+    plt.ylabel('Sentiment Score (Compound)')
+    plt.tight_layout()
+
+    st.pyplot(plt)
+
+def friends_amount_sentiment(df_sent):
+    df_sent = df_sent[df_sent['sentiment'] != 'neutral']
+
+    # Create a scatter plot of the number of friends vs sentiment score
+    plt.figure(figsize=(10, 6))
+    plt.scatter(df_sent['user_friends'], df_sent['compound'], alpha=0.5)
+    plt.title('Number of Friends vs Sentiment Score')
+    plt.xlabel('Number of Friends')
+    plt.ylabel('Sentiment Score (Compound)')
+    plt.tight_layout()
+
+    st.pyplot(plt)
+
+def average_followers_sentiment(df_sent):
+    df_sent = df_sent[df_sent['sentiment'] != 'neutral']
+
+    #Check for outliers 
+    q1 = df_sent['user_followers'].quantile(0.25)
+    q3 = df_sent['user_followers'].quantile(0.75)
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+
+    #filter to remove outliers
+    df_sent = df_sent[(df_sent['user_followers'] > lower_bound) & (df_sent['user_followers'] < upper_bound)]
+
+    # Create a visual showing positive and negative sentiment and their average followers:
+    avg_followers = df_sent.groupby('sentiment')['user_followers'].mean()
+
+    plt.figure(figsize=(10, 6))
+    avg_followers.plot(kind='bar', color=['#1E90FF', '#FF69B4'])
+    plt.title('Average Followers by Sentiment')
+    plt.xlabel('Sentiment')
+    plt.ylabel('Average Followers')
+    plt.tight_layout()
+
+    st.pyplot(plt)
+
+def percentage_verfied_user_by_sentiment(df_sent):
+    df_sent = df_sent[df_sent['sentiment'] != 'neutral']
+
+
+    df_sent['user_verified'] = df_sent['user_verified'].map({'false': False, 'true': True})
+
+    # Create a visual showing the percentage of verified users by sentiment (true or false)
+
+    verified_users = df_sent.groupby('sentiment')['user_verified'].value_counts(normalize=True).unstack().fillna(0)
+
+
+
+    plt.figure(figsize=(10, 6))
+    verified_users.plot(kind='bar', color=['#1E90FF', '#FF69B4'])
+    plt.title('Percentage of Verified Users by Sentiment')
+    plt.xlabel('Sentiment')
+    plt.ylabel('Percentage of Verified Users')
+    plt.tight_layout()
+
+    st.pyplot(plt)
+
 
 
 # run: streamlit run streamlit.py
@@ -264,8 +372,25 @@ def main():
     st.write(f"Number of tweets mentioning 'conspiracy': {conspiracy_count}")
 
 
+    st.write("### Top Hashtags")
+    st.write("The bar plots below show the top 10 hashtags in positive and negative tweets.")
+    top_hashtags_per_sentiment(df_sent, 'positive')
 
+    st.write("### Followers vs Sentiment")
+    st.write("The scatter plot below shows the relationship between the number of followers and sentiment score.")
+    follower_amount_sentiment(df_sent)
 
+    st.write("### Verified Users vs Sentiment")
+    st.write("The plot below shows the average amount of followers per sentiment (outliers have been omitted by using the IQR).")
+    average_followers_sentiment(df_sent)
+
+    st.write("### Friends vs Sentiment")
+    st.write("The scatter plot below shows the relationship between the number of friends and sentiment score.")
+    friends_amount_sentiment(df_sent)
+
+    st.write("### Average Followers by Sentiment")
+    st.write("The bar plot below shows the average number of followers by sentiment.")
+    percentage_verfied_user_by_sentiment(df_sent)
     
 
 
