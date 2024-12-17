@@ -391,6 +391,8 @@ def main():
     st.write("### Average Followers by Sentiment")
     st.write("The bar plot below shows the average number of followers by sentiment.")
     percentage_verfied_user_by_sentiment(df_sent)
+
+    
     
 
 
