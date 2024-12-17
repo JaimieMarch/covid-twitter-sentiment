@@ -6,6 +6,7 @@ import sys
 import os
 import seaborn as sns
 from wordcloud import WordCloud
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score
 
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 
@@ -61,12 +62,38 @@ def get_sentiment_data(table):
 def classify_sentiment(row):
     compound = row['compound']
     
-    if compound > 0.05:
+    if compound >= 0.05:
         return 'positive'
-    elif compound < -0.05:
+    elif compound <= -0.05:
         return 'negative'
     else:
         return 'neutral'
+    
+def accuracy_plot(df):
+    cm = confusion_matrix(df['labelled_sentiment'], df['sentiment'], labels=['positive', 'negative', 'neutral'])
+
+    cm_df = pd.DataFrame(cm, index=['positive', 'negative', 'neutral'], columns=['positive', 'negative', 'neutral'])
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm_df, annot=True, fmt='d', cmap='Blues')
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.tight_layout()
+
+    st.pyplot(plt)
+
+def accuracy_metrics(df):
+    # Accuracy calculation
+    accuracy = accuracy_score(df['labelled_sentiment'], df['sentiment'])
+    
+    # Precision, recall, and f1 score for each sentiment class
+    precision = precision_score(df['labelled_sentiment'], df['sentiment'], average=None, labels=['positive', 'negative', 'neutral'])
+    recall = recall_score(df['labelled_sentiment'], df['sentiment'], average=None, labels=['positive', 'negative', 'neutral'])
+    f1 = f1_score(df['labelled_sentiment'], df['sentiment'], average=None, labels=['positive', 'negative', 'neutral'])
+    
+    return accuracy, precision, recall, f1
+
 
 # Creates a time series plot
 def create_time_series(df_clean):
@@ -331,6 +358,15 @@ def main():
     df_sent['sentiment'] = df_sent.apply(classify_sentiment, axis=1)
     df_tf_idf = get_sentiment_data("tfidf_results_1")
 
+    df_labelled_results = get_sentiment_data("processed_labelled_twitter_data")
+
+    df_labelled_vader = get_sentiment_data("labelled_sentiment_scores")
+
+    df_joined_table = df_labelled_results.merge(df_labelled_vader, on='id', how='inner')
+
+    df_joined_table['sentiment'] = df_joined_table.apply(classify_sentiment, axis=1)
+
+
 
     #Webpage title
     st.title("Covid-19 Tweets Sentiment Analysis 🦠")
@@ -392,6 +428,41 @@ def main():
     st.write("The bar plot below shows the average number of followers by sentiment.")
     percentage_verfied_user_by_sentiment(df_sent)
 
+    st.write("Analyzing accuracy of Vader Sentiment Analysis")
+    st.write("To analyze the accuracy of the Vader sentiment analysis, we compare the results of Vader on a table with the labelled sentiment scores.")
+    st.write("The table below is an example of the dataset (with the vader sentiment scores) we will be comparing:")
+    st.dataframe(df_joined_table.head(5))
+
+    accuracy, precision, recall, f1 = accuracy_metrics(df_joined_table)
+
+    # st.write("### Accuracy Metrics")
+    # st.write("The accuracy metrics below show the performance of the Vader sentiment analysis.")
+    # st.write(f"**Accuracy Positive:** {accuracy[0]:.2f}")
+    # st.write(f"**Accuracy Negative:** {accuracy[1]:.2f}")
+    # st.write(f"**Accuracy Neutral:** {accuracy[2]:.2f}")
+
+    st.write(f"**Precision Positive:** {precision[0]:.2f}")
+    st.write(f"**Precision Negative:** {precision[1]:.2f}")
+    st.write(f"**Precision Neutral:** {precision[2]:.2f}")
+    st.write("")
+    st.write(f"**Recall Positive:** {recall[0]:.2f}")
+    st.write(f"**Recall Negative:** {recall[1]:.2f}")
+    st.write(f"**Recall Neutral:** {recall[2]:.2f}")
+    st.write("")
+    st.write(f"**F1 Score Positive:** {f1[0]:.2f}")
+    st.write(f"**F1 Score Negative:** {f1[1]:.2f}")
+    st.write(f"**F1 Score Neutral:** {f1[2]:.2f}")
+
+
+
+
+
+    st.write("### Confusion Matrix")
+    st.write("The confusion matrix below shows the accuracy of the Vader sentiment analysis.")
+    accuracy_plot(df_joined_table)
+
+
+    
     
     
 
